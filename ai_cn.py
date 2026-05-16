@@ -93,6 +93,13 @@ KEYWORDS = [
     ("列表", "list"),
     ("字典", "dict"),
     ("集合", "set"),
+    ("打开", "open"),
+    ("追加", "append"),
+    ("写入", "write"),
+    ("读取", "read"),
+    ("关闭", "close"),
+    ("移除", "remove"),
+    ("编码", "encoding"),
 
     # 常量
     ("真", "True"),
@@ -163,7 +170,7 @@ def is_cjk_identifier_start(char: str) -> bool:
 
 def is_cjk_identifier_continue(char: str) -> bool:
     """判断字符能否作为标识符继续"""
-    return char.isalnum() or char == '_' or is_cjk(char) or char == '.'
+    return char.isalnum() or char == '_' or is_cjk(char)
 
 
 def tokenize(source: str) -> list:
@@ -337,7 +344,7 @@ def generate_python(tokens: list, ai_utils_auto_import: bool = True) -> str:
                 'if', 'elif', 'while', 'for', 'def', 'class',
                 'return', 'and', 'or', 'not', 'is', 'import', 'from',
                 'as', 'del', 'in', 'raise', 'global', 'nonlocal',
-                'elif',
+                'elif', 'None', 'except',
             )
             if needs_space and python_keyword != 'elif':
                 # elif后面也有空格，但通过正常逻辑处理
