@@ -1,6 +1,6 @@
 """
-AI原生中文编程语言 - 编译器/运行时
-====================================
+知序 (Zhixu) - 中文编程语言
+===============================
 
 核心理念：既然和 AI 对话用的是中文，AI 写代码也应该用中文。
 省掉「中文想法 → 英文代码」这道不必要的翻译损耗。
@@ -424,7 +424,7 @@ def generate_python(tokens: list, ai_utils_auto_import: bool = True) -> str:
 
     # 自动注入AI工具包导入
     if used_ai_keywords and ai_utils_auto_import:
-        code = "from ai_cn_utils import *\n" + code
+        code = "from zhixu_utils import *\n" + code
 
     # 重新计算行号映射：统计原始源码行和生成代码行的对应关系
     # 实际上这个在 tokenizer 级别更精确，我们保留后做简化映射
@@ -474,7 +474,7 @@ def translate(source: str) -> str:
 # 第四部分：智能错误处理（中文报错）
 # ============================================================
 
-class AI_CN_Error(Exception):
+class ZhixuError(Exception):
     """中文编程语言运行时错误"""
     def __init__(self, message: str, original_tb=None):
         self.message = message
@@ -482,19 +482,19 @@ class AI_CN_Error(Exception):
         super().__init__(self._format())
 
     def _format(self):
-        msg = f"\n[WARN]  AI中文编程执行错误\n"
+        msg = f"\n[WARN]  知序中文编程执行错误\n"
         msg += f"{'='*50}\n"
         msg += f"错误信息: {self.message}\n"
         if self.original_tb:
             msg += f"\n原始错误:\n"
             msg += ''.join(traceback.format_tb(self.original_tb))
-        msg += f"\n[IDEA] 提示：检查你的 .ai_cn 文件中对应行号附近的语法\n"
+        msg += f"\n[IDEA] 提示：检查你的 .zx 文件中对应行号附近的语法\n"
         return msg
 
 
 def run_file(file_path: str):
     """
-    执行 .ai_cn 文件
+    执行 .zx 文件
 
     流程：读取 → 转译 → 执行
     """
@@ -506,7 +506,7 @@ def run_file(file_path: str):
         py_code = translate(source)
 
         # 显示转译后的代码（debug模式）
-        if os.environ.get('AI_CN_DEBUG'):
+        if os.environ.get('ZHIXU_DEBUG'):
             print("=" * 50)
             print("[转译后的Python代码]:")
             print("=" * 50)
@@ -518,12 +518,12 @@ def run_file(file_path: str):
         exec_globals = {'__builtins__': __builtins__}
         exec(py_code, exec_globals)
 
-    except AI_CN_Error:
+    except ZhixuError:
         raise
     except Exception as e:
         tb = sys.exc_info()[2]
 
-        # 尝试定位原始 .ai_cn 文件中的行号
+        # 尝试定位原始 .zx 文件中的行号
         error_line = None
         while tb:
             if tb.tb_frame.f_code.co_name == '<module>':
@@ -533,7 +533,7 @@ def run_file(file_path: str):
 
         msg = f"{e}"
         if error_line:
-            msg += f"\n\n大概在 .ai_cn 文件的第 {error_line} 行附近。"
+            msg += f"\n\n大概在 .zx 文件的第 {error_line} 行附近。"
 
         print(f"\n[WARN]  执行出错: {e}")
         if error_line:
@@ -552,7 +552,7 @@ def run_file(file_path: str):
 
 def export_file(input_path: str, output_path: str):
     """
-    将 .ai_cn 文件导出为标准 Python 文件
+    将 .zx 文件导出为标准 Python 文件
     """
     try:
         with open(input_path, 'r', encoding='utf-8') as f:
@@ -563,7 +563,7 @@ def export_file(input_path: str, output_path: str):
         with open(output_path, 'w', encoding='utf-8') as f:
             # 添加头部注释
             f.write("# -*- coding: utf-8 -*-\n")
-            f.write("# 此文件由 AI中文编程 自动生成\n")
+            f.write("# 此文件由 知序中文编程 自动生成\n")
             f.write(f"# 源文件: {os.path.basename(input_path)}\n")
             f.write("# 不建议直接修改此文件，请修改源文件后重新生成\n\n")
             f.write(py_code)
@@ -630,28 +630,28 @@ def repl():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="AI原生中文编程语言 - 编译器/解释器",
+        description="知序 (Zhixu) - 中文编程语言 编译器/解释器",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例用法:
-  python ai_cn.py run demo.ai_cn       # 执行中文代码
-  python ai_cn.py export demo.ai_cn    # 导出为Python代码
-  python ai_cn.py repl                  # 进入交互模式
+  zx run demo.zx                       # 执行中文代码
+  zx export demo.zx                    # 导出为Python代码
+  zx repl                              # 进入交互模式
 
 环境变量:
-  AI_CN_DEBUG=1  显示转译后的Python代码
+  ZHIXU_DEBUG=1  显示转译后的Python代码
         """
     )
 
     subparsers = parser.add_subparsers(dest="command", help="可用命令")
 
     # run 命令
-    run_parser = subparsers.add_parser("run", help="执行 .ai_cn 文件")
-    run_parser.add_argument("file", help="中文代码文件路径 (.ai_cn)")
+    run_parser = subparsers.add_parser("run", help="执行 .zx 文件")
+    run_parser.add_argument("file", help="中文代码文件路径 (.zx)")
 
     # export 命令
     export_parser = subparsers.add_parser("export", help="导出为标准 Python 代码")
-    export_parser.add_argument("input", help="源文件路径 (.ai_cn)")
+    export_parser.add_argument("input", help="源文件路径 (.zx)")
     export_parser.add_argument("output", nargs="?", help="输出路径 (.py，可选)")
 
     # repl 命令

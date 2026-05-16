@@ -3,17 +3,17 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.backends._legacy:_Backend"
 
 [project]
-name = "ai-cn"
-version = "2.0.0"
-description = "AI原生中文编程语言 - 用中文写AI代码"
+name = "zhixu"
+version = "1.0.0"
+description = "知序 - 中文编程语言。用中文写代码，与 AI 自然对话"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
-keywords = ["chinese-programming", "ai", "mcp", "nlp"]
+keywords = ["chinese-programming", "zhixu", "zhongwen", "ai"]
 
 [project.scripts]
-ai-cn = "ai_cn:main"
+zhixu = "zhixu:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["ai_cn*"]
+include = ["zhixu*"]
